@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.catbreeds.example.viewModel.CatsViewModelTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-11-25T10:55:29" hostname="AY-LP-RBANURI" time="0.222">
+  <properties/>
+  <testcase name="testGetCatsBreedsApiData" classname="com.catbreeds.example.viewModel.CatsViewModelTest" time="0.222"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Cat Breeds</string>
+
+    <string name="no_internet_connection">No Internet connection</string>
+    <string name="both_are_not_equal">Both are not equal</string>
+
+
+    <string name="no_cat_breeds_founds">Could not find cat breeds.</string>
+
+
+    <string name="breed_details">Breed Details</string>
+    <string name="breed">Breed</string>
+    <string name="country">Country</string>
+    <string name="coat">Coat</string>
+    <string name="origin">Origin</string>
+    <string name="fetch_success">Fetch success</string>
+
+</resources>
