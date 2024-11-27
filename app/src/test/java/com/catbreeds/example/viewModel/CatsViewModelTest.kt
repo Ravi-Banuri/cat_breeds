@@ -1,9 +1,7 @@
 package com.catbreeds.example.viewModel
 
-import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.catbreeds.example.R
-import com.catbreeds.example.domain.repositories.CatBreedsRepositoryImpl
+import com.catbreeds.example.data.repositories.CatBreedsRepositoryImpl
 import com.catbreeds.example.data.services.CatBreedService
 import com.catbreeds.example.data.services.catbreeds.CatBreedApiServiceHelperImpl
 import com.catbreeds.example.domain.repositories.CatBreedsRepository
@@ -13,6 +11,10 @@ import com.catbreeds.example.models.catBreedMocks.toCatBreedDataModels
 import com.catbreeds.example.models.catBreedMocks.toCatBreedsAPIResponce
 import com.catbreeds.example.presentation.ui.features.catbreeds.viewModel.CatsViewModel
 import com.catbreeds.example.presentation.ui.features.catbreeds.viewModel.SharedDataRepository
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.confirmVerified
+import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -23,35 +25,25 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
-import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
-import org.mockito.junit.MockitoJUnitRunner
 import kotlin.test.DefaultAsserter.assertEquals
 
 
 @ExperimentalCoroutinesApi
-@RunWith(MockitoJUnitRunner::class)
 class CatsViewModelTest {
     private lateinit var mCatsRepo: CatBreedsRepository
-    private val application: Application = mock()
     private lateinit var mViewModel: CatsViewModel
 
     @get:Rule
     val testInstantTaskExecutorRules: TestRule = InstantTaskExecutorRule()
 
-    @Mock
-    lateinit var catService: CatBreedService
+    // Mocking the API service
+    private val catService: CatBreedService = mockk()
 
     private val testDispatcher = StandardTestDispatcher()
 
     @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
-        MockitoAnnotations.openMocks(this)
         val apiHelper = CatBreedApiServiceHelperImpl(catService)
         mCatsRepo = CatBreedsRepositoryImpl(apiHelper)
         Dispatchers.setMain(testDispatcher)
@@ -65,23 +57,31 @@ class CatsViewModelTest {
     @Test
     fun testGetCatsBreedsApiData() = runTest(UnconfinedTestDispatcher()) {
         Dispatchers.setMain(Dispatchers.Unconfined)
+
+        // Arrange
         val mockCatBreedsResponse = MockCatBreedsResponse()
         val response = toCatBreedsAPIResponce(mockCatBreedsResponse)
         val verifyData = toCatBreedDataModels(mockCatBreedsResponse)
-        `when`(catService.fetchCatBreeds(10)).thenReturn(response)// Mock the API response
-        verify(catService).fetchCatBreeds(10)
+
+        // Mock API response using MockK
+        coEvery { catService.fetchCatBreeds(10) } returns response
+
+        // Verify interactions with the mocked service
+        coVerify(exactly = 1) { catService.fetchCatBreeds(10) }
+        confirmVerified(catService)
+        // Act
         mViewModel.getCatsBreedsData()
-        testDispatcher.scheduler.advanceUntilIdle() // Let the coroutine complete and changes propagate
-        val result = mViewModel.breedsState.value.catBreeds
+        testDispatcher.scheduler.advanceUntilIdle() // Let the coroutine complete
+
         assertEquals(
-            application.getString(R.string.both_are_not_equal),
-            result.size,
+            "Both are not same size",
+            mViewModel.breedsState.value.catBreeds.size,
             verifyData.size
         )
 
         assertEquals(
-            application.getString(R.string.both_are_not_equal),
-            result[0].breed,
+            "Both are not equal",
+            mViewModel.breedsState.value.catBreeds[0].breed,
             verifyData[0].breed
         )
     }

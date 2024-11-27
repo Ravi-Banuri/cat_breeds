@@ -1,8 +1,9 @@
-package com.catbreeds.example.domain.repositories
+package com.catbreeds.example.data.repositories
 
 import com.catbreeds.example.data.NetworkResult
 import com.catbreeds.example.data.models.catBreedData.CatBreedsResponse
 import com.catbreeds.example.data.services.catbreeds.CatBreedApiServiceHelper
+import com.catbreeds.example.domain.repositories.CatBreedsRepository
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 

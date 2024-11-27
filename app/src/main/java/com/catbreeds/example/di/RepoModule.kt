@@ -1,6 +1,6 @@
 package com.catbreeds.example.di
 
-import com.catbreeds.example.domain.repositories.CatBreedsRepositoryImpl
+import com.catbreeds.example.data.repositories.CatBreedsRepositoryImpl
 import com.catbreeds.example.data.services.catbreeds.CatBreedApiServiceHelper
 import com.catbreeds.example.domain.repositories.CatBreedsRepository
 import dagger.Module
