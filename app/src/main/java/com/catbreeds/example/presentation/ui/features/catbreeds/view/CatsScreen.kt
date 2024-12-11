@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
@@ -27,12 +26,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
@@ -40,23 +39,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.catbreeds.example.R
 import com.catbreeds.example.domain.mappers.CatBreedDataModel
 import com.catbreeds.example.presentation.contracts.BaseContract
 import com.catbreeds.example.presentation.contracts.CatBreedsContract
 import com.catbreeds.example.presentation.ui.components.EmptyView
+import com.catbreeds.example.presentation.ui.features.catbreeds.viewModel.CatsViewModel
 import com.catbreeds.example.presentation.ui.theme.lightYellow
 import com.catbreeds.example.utils.TestTags
 import com.catbreeds.example.utils.TestTags.PROGRESS_BAR
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CatScreen(
-    state: CatBreedsContract.State,
-    effectFlow: Flow<BaseContract.Effect>?,
-    onNavigationRequested: (item : CatBreedDataModel) -> Unit,
+    navController: NavController,
+    viewModel: CatsViewModel
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -64,8 +64,8 @@ fun CatScreen(
 
 
     // Listen for side effects from the VM
-    LaunchedEffect(effectFlow) {
-        effectFlow?.onEach { effect ->
+    LaunchedEffect(Unit) {
+        viewModel.effects?.receiveAsFlow()?.onEach { effect ->
             if (effect is BaseContract.Effect.DataWasLoaded)
                 snackBarHostState.showSnackbar(
                     message = catMessage,
@@ -85,16 +85,21 @@ fun CatScreen(
         },
     ) { paddingValues ->
         Surface(modifier = Modifier.padding(top = 5.dp)) {
-            UserView(
-                state,
-                onNavigationRequested = onNavigationRequested
+            CatBreedsListScreen(
+                navController,
+                viewModel.breedsState.collectAsState().value,
+                onNavigationRequested = { item->
+                    viewModel.updateSelctedCatBreed(item)
+
+                }
             )
         }
     }
 }
 
 @Composable
-fun UserView(
+fun CatBreedsListScreen(
+    navController: NavController,
     state: CatBreedsContract.State,
     onNavigationRequested: (item: CatBreedDataModel) -> Unit
 ) {
@@ -105,6 +110,7 @@ fun UserView(
                 EmptyView(message = stringResource(R.string.no_cat_breeds_founds))
             } else
                 CatsList(
+                    navController,
                     cats = cats,
                     isLoading = state.isLoading
                 ) { item ->
@@ -113,7 +119,6 @@ fun UserView(
             if (state.isLoading)
                 LoadingBar()
         }
-
     }
 }
 
@@ -141,6 +146,7 @@ private fun CatAppBar() {
 
 @Composable
 fun CatsList(
+    navController: NavController,
     isLoading: Boolean = false,
     cats: List<CatBreedDataModel>,
     onItemClicked: (item: CatBreedDataModel) -> Unit = { _: CatBreedDataModel -> },
@@ -157,6 +163,7 @@ fun CatsList(
                     .clickable {
                         if (!isLoading) {
                             onItemClicked(item)
+                            navController.navigate("catBreedDetails")
                         }
                     },
             ) {

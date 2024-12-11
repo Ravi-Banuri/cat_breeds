@@ -10,7 +10,6 @@ import com.catbreeds.example.models.catBreedMocks.MockCatBreedsResponse
 import com.catbreeds.example.models.catBreedMocks.toCatBreedDataModels
 import com.catbreeds.example.models.catBreedMocks.toCatBreedsAPIResponce
 import com.catbreeds.example.presentation.ui.features.catbreeds.viewModel.CatsViewModel
-import com.catbreeds.example.presentation.ui.features.catbreeds.viewModel.SharedDataRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
@@ -36,7 +35,6 @@ class CatsViewModelTest {
     @get:Rule
     val testInstantTaskExecutorRules: TestRule = InstantTaskExecutorRule()
 
-    // Mocking the API service
     private val catService: CatBreedService = mockk()
 
     private val testDispatcher = StandardTestDispatcher()
@@ -49,9 +47,8 @@ class CatsViewModelTest {
         Dispatchers.setMain(testDispatcher)
         val catbreedUseCase = CatBreedsFetchUseCaseImpl(mCatsRepo)
 
-        val sharedRepo = SharedDataRepository()
 
-        mViewModel = CatsViewModel(catbreedUseCase, sharedRepo)
+        mViewModel = CatsViewModel(catbreedUseCase)
     }
 
     @Test

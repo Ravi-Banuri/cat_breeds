@@ -41,6 +41,23 @@ fun toCatBreedsAPIResponce(mocksCatBreedResp: MockCatBreedsResponse): Response<C
     )
 }
 
+fun toCatBreedsRepoResponce(mocksCatBreedResp: MockCatBreedsResponse): CatBreedsResponse {
+    return CatBreedsResponse(
+            currentPage = mocksCatBreedResp.currentPage,
+            data = mocksCatBreedResp.data,
+            firstPageUrl = mocksCatBreedResp.firstPageUrl,
+            from = mocksCatBreedResp.from,
+            lastPageUrl = mocksCatBreedResp.lastPageUrl,
+            links = mocksCatBreedResp.links,
+            nextPageUrl = mocksCatBreedResp.nextPageUrl,
+            path = mocksCatBreedResp.path,
+            perPage = mocksCatBreedResp.perPage,
+            prevPageUrl = mocksCatBreedResp.prevPageUrl,
+            to = mocksCatBreedResp.to,
+            total = mocksCatBreedResp.total
+        )
+}
+
 fun toCatBreedDataModels(mocksCatBreedResp: MockCatBreedsResponse): List<CatBreedDataModel> {
     return mocksCatBreedResp.data.map {
         CatBreedDataModel(

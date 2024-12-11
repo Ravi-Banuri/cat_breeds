@@ -27,10 +27,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.catbreeds.example.presentation.ui.features.catbreeds.CatBreedDetailActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:exported="false" />
     </application>
 
 </manifest>

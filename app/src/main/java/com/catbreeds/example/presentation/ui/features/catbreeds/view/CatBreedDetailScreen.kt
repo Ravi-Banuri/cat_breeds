@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.catbreeds.example.R
 import com.catbreeds.example.domain.mappers.CatBreedDataModel
+import com.catbreeds.example.presentation.ui.features.catbreeds.viewModel.CatsViewModel
 import com.catbreeds.example.presentation.ui.theme.lightYellow
 import com.catbreeds.example.utils.TestTags.BACK_NAVIGATION_ICON_DESCRIPTION
 import com.catbreeds.example.utils.TestTags.FULL_SCREEN_APP_BAR
@@ -40,12 +41,13 @@ import com.catbreeds.example.utils.TestTags.FULL_SCREEN_APP_BAR
 @Composable
 fun CatFullDetail(
     onBackPressed: () -> Unit,
-    item: CatBreedDataModel?
+    item: CatBreedDataModel?,
+    viewModel: CatsViewModel,
 ) {
     Scaffold( // in scaffold we are specifying top bar.
         topBar = { CatFullScreenAppBar(onBackPressed, stringResource(R.string.breed_details)) }) {
         Surface(modifier = Modifier.padding(top = it.calculateTopPadding())) {
-            CatDetails(item)
+            CatDetails(viewModel.selectedBreed.value)
         }
     }
 }
@@ -99,7 +101,7 @@ fun CatDetails(item: CatBreedDataModel?) {
                 .align(Alignment.BottomCenter),
         ) {
 
-            if ( !item?.breed.isNullOrBlank()) {
+            if ( item != null) {
                 Column(
                     modifier = Modifier
                         .background(lightYellow)
@@ -107,29 +109,33 @@ fun CatDetails(item: CatBreedDataModel?) {
                         .align(Alignment.BottomStart),
                 ) {
                     Text(
-                        text = "${stringResource(R.string.breed)} : ${item?.breed ?: ""}",
+                        text = "${stringResource(R.string.breed)} : ${item.breed}",
 
                         modifier = Modifier.padding(horizontal = 10.dp),
                         color = colorResource(id = R.color.black),
                     )
-                    item?.origin?.let {
-                        Text(
-                            text = "${stringResource(R.string.origin)} : ${it}",
-                            modifier = Modifier.padding(horizontal = 10.dp),
-                            color = colorResource(id = R.color.black),
-                        )
-                    }
                     Text(
-                        text = "${stringResource(R.string.coat)} : ${item?.coat ?: ""}",
+                        text = "${stringResource(R.string.origin)} : ${item.origin}",
                         modifier = Modifier.padding(horizontal = 10.dp),
                         color = colorResource(id = R.color.black),
                     )
                     Text(
-                        text = "${stringResource(R.string.country)} : ${item?.country ?: ""}",
+                        text = "${stringResource(R.string.coat)} : ${item.coat}",
+                        modifier = Modifier.padding(horizontal = 10.dp),
+                        color = colorResource(id = R.color.black),
+                    )
+                    Text(
+                        text = "${stringResource(R.string.country)} : ${item.country}",
                         modifier = Modifier.padding(horizontal = 10.dp),
                         color = colorResource(id = R.color.black),
                     )
                 }
+            } else {
+                Text(
+                    text = "${stringResource(R.string.no_item_selected)} ",
+                    modifier = Modifier.padding(horizontal = 10.dp),
+                    color = colorResource(id = R.color.red),
+                )
             }
         }
     }

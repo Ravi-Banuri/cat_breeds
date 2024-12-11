@@ -91,6 +91,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
+    testImplementation(libs.mockk)
     //For runBlockingTest, CoroutineDispatcher etc.
     testImplementation(libs.kotlinx.coroutines.test)
     //For InstantTaskExecutorRule
@@ -123,6 +124,7 @@ dependencies {
     implementation(libs.dagger.hilt.android)
     ksp(libs.dagger.compiler)
     ksp(libs.dagger.hilt.android.compiler)
+    implementation(libs.hilt.navigation.compose)
     //Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)

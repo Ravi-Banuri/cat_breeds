@@ -14,5 +14,6 @@
     <string name="coat">Coat</string>
     <string name="origin">Origin</string>
     <string name="fetch_success">Fetch success</string>
+    <string name="no_item_selected">Selected Breed not available</string>
 
 </resources>

@@ -1,46 +1,58 @@
 package com.catbreeds.example.presentation.ui.features.catbreeds
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.catbreeds.example.presentation.ui.features.catbreeds.view.CatFullDetail
 import com.catbreeds.example.presentation.ui.features.catbreeds.view.CatScreen
 import com.catbreeds.example.presentation.ui.features.catbreeds.viewModel.CatsViewModel
 import com.catbreeds.example.presentation.ui.theme.ComposeSampleTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.receiveAsFlow
 
 @AndroidEntryPoint
 class CatBreedsActivity : ComponentActivity() {
-    private val viewModel: CatsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeSampleTheme {
-                CatsDestination()
+                NavigationSystem()
             }
         }
     }
 
-
     @Composable
-    fun CatsDestination() {
-        CatScreen(
-            state = viewModel.breedsState.collectAsState().value,
-            effectFlow = viewModel.effects.receiveAsFlow(),
-            onNavigationRequested = { item ->
-                viewModel.updateSelctedCatBreed(item)
-                startActivity(Intent(
-                    this@CatBreedsActivity,
-                    CatBreedDetailActivity::class.java
-                ))
-            },
-           )
+    fun NavigationSystem() {
+        val navController = rememberNavController()
+        val viewModel: CatsViewModel = hiltViewModel()
+
+        NavHost(navController = navController, startDestination = "catBreeds") {
+
+            composable("catBreeds") {
+                CatScreen(
+                    navController,
+                    viewModel =viewModel,
+                    )
+            }
+            composable("catBreedDetails") {
+
+               /* val viewModel: CatsViewModel =
+                    if (navController.previousBackStackEntry != null) hiltViewModel(
+                        navController.previousBackStackEntry!!
+                    ) else hiltViewModel()*/
+                CatFullDetail(
+                    onBackPressed = {
+                        onBackPressedDispatcher.onBackPressed()
+                    },
+                    item = null,
+                    viewModel = viewModel
+                )
+            }
+        }
     }
-
-
 }

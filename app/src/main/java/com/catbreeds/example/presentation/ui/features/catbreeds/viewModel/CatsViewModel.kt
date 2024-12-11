@@ -1,6 +1,8 @@
 package com.catbreeds.example.presentation.ui.features.catbreeds.viewModel
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.catbreeds.example.data.NetworkResult
@@ -19,8 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CatsViewModel @Inject constructor(
-    private val catUseCase: CatBreedsFetchUseCase,
-    private val repository: SharedDataRepository
+    private val catUseCase: CatBreedsFetchUseCase
 ) : ViewModel() {
     init {
         getCatsBreedsData()
@@ -35,18 +36,18 @@ class CatsViewModel @Inject constructor(
 
     val breedsState: StateFlow<CatBreedsContract.State> = _breedsState
 
-    val selctedCatBreed: LiveData<CatBreedDataModel> get() = repository.selectedBreed
+    private val _selectedBreed = MutableLiveData<CatBreedDataModel>()
+    val selectedBreed: LiveData<CatBreedDataModel> get() = _selectedBreed
 
     var effects = Channel<BaseContract.Effect>(Channel.UNLIMITED)
         private set
 
     private fun updateCatBreedState(newState: CatBreedsContract.State) {
-        //repository.updateData(newState)
         _breedsState.value = newState
     }
 
     fun updateSelctedCatBreed(catBreed: CatBreedDataModel) {
-        repository.updateSelctedBreed(catBreed)
+        _selectedBreed.value = catBreed
     }
 
     fun getCatsBreedsData() {
@@ -54,7 +55,8 @@ class CatsViewModel @Inject constructor(
             catUseCase.executeFetchCatBreeds().collect {
                 when (it) {
                     is NetworkResult.Success -> {
-                        val newState = breedsState.value.copy(catBreeds = it.data!!, isLoading = false)
+                        val newState =
+                            breedsState.value.copy(catBreeds = it.data!!, isLoading = false)
                         updateCatBreedState(newState)
                         effects.send(BaseContract.Effect.DataWasLoaded)
                     }
@@ -81,6 +83,5 @@ class CatsViewModel @Inject constructor(
 
         }
     }
-
 
 }
